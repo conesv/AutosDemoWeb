@@ -1,0 +1,51 @@
+﻿@model DALAUTOS.Model.Auto
+
+@{
+    ViewData["Title"] = "BorrarAuto";
+}
+
+<h1>Borrar Auto</h1>
+
+<h3>Seguro que desea eliminar este auto?</h3>
+<div class="d-flex justify-content-center">
+    <br />
+    <div class="col-sm-6">
+        <div class="card" style="width: 18rem; position: relative;">
+            <img src="@Model.Marca.Logo" alt="Logo" class="logo-img">
+            <img class="card-img-top fixed-size-img" src="@Model.Modelo.Foto" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">@Model.Modelo.Name</h5>
+                <h6 class="card-title">@Model.Placas</h6>
+                <br>
+                @Html.DisplayFor(modelItem => Model.status) status
+                <br>
+                <p class="card-text">@Model.Color.NColor - @Model.year</p>
+            </div>
+            <div class="card-footer">
+                <form asp-action="BorrarAuto">
+                    <input type="hidden" asp-for="Id" />
+                    <a asp-action="ConfirmacionBorrar" asp-controller="Autos" asp-route-id="@Model.Id" class="btn btn-danger">Eliminar</a>
+                    <br />
+                    <a asp-action="VerAutos" asp-route-page="1">Volver</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    <br />  
+</div>
+
+<style>
+    .logo-img {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .fixed-size-img {
+        width: 100%;
+        height: 200px; /* Ajusta la altura deseada */
+        object-fit: cover;
+    }
+</style>

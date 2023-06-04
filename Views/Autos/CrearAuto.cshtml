@@ -1,0 +1,163 @@
+﻿@using BLLAUTOS;
+@model DALAUTOS.Model.Auto
+
+@{
+    ViewData["Title"] = "CrearAuto";
+    //ColorBLL _colorBLL = new ColorBLL();
+    //MarcasBLL _marcasBLL = new MarcasBLL();
+    //ModelosBLL _modelosBLL = new ModelosBLL();
+    //var marcas = await _marcasBLL.GetMarcasAsync();
+    //var colores = await _colorBLL.GetColorsAsync();
+    //var modelos = await _modelosBLL.GetModelosAsync();
+}
+
+<h1>Crear Auto</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CrearAuto">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="MarcaId" class="control-label">Marca</label>
+                <select id="marca-select" asp-for="MarcaId" class="form-control">
+                  @*  @foreach (var marca in marcas)
+                    {
+                        <option value="@marca.Id">@marca.NMarca</option>
+                    }*@
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ColorId" class="control-label">Color</label>
+                <select id="color-select" asp-for="ColorId" class="form-control">
+                    @*@foreach (var color in colores)
+                    {
+                        <option value="@color.Id">@color.NColor</option>
+                    }*@
+                </select>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="status" /> @Html.DisplayNameFor(model => model.status)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="year" class="control-label">Año</label>
+                <input asp-for="year" class="form-control" />
+                <span asp-validation-for="year" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ModeloId" class="control-label">Modelo</label>
+                <select id="modelo-select" asp-for="ModeloId" class="form-control">
+                    @*@foreach (var modelo in modelos)
+                    {
+                        <option value="@modelo.Id">@modelo.Name</option>
+                    }*@
+                </select>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Crear" class="btn btn-primary" alt="Seleccione un auto" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <img src="" width="800" height="600" id="Image-Auto" />
+    </div>
+</div>
+
+<div>
+    <a asp-action="VerAutos">Voler</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script>
+    var marcaSelect = document.getElementById("marca-select");
+    var modeloSelect = document.getElementById("modelo-select");
+    var imagenauto = document.getElementById("Image-Auto");
+    var colorSelect = document.getElementById("color-select")
+
+    marcaSelect.addEventListener("change", function () {
+        updateImage();
+    });
+
+    modeloSelect.addEventListener("change", function () {
+        var modeloId = modeloSelect.value;
+        var url = "/Autos/GetModeloById?modeloId=" + modeloId;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                imagenauto.src = data;
+            })
+            .catch(error => console.log(error));
+    });
+
+    window.onload = function () {
+        getModels();
+        getColores();
+    }
+
+    function updateImage() {
+        var marcaId = marcaSelect.value;
+        var url = "/Autos/GetModelosByMarca?marcaId=" + marcaId;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                modeloSelect.innerHTML = "";
+
+                data.forEach(function (modelo) {
+                    var option = document.createElement("option");
+                    option.value = modelo.id;
+                    option.text = modelo.name;
+                    modeloSelect.appendChild(option);
+
+
+                    var modeloId = modeloSelect.value;
+                    var url = "/Autos/GetModeloById?modeloId=" + modeloId;
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            imagenauto.src = data;
+                        })
+                        .catch(error => console.log(error))
+                });
+            })
+            .catch(error => console.log(error));
+    }
+
+    function getModels() {
+        var url = "/Autos/GetMarcas";
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(function (marca) {
+                    var option = document.createElement("option");
+                    option.value = marca.id;
+                    option.text = marca.nMarca;
+                    marcaSelect.appendChild(option);
+                    updateImage();
+                });
+            })
+    }
+
+    function getColores(){
+        var url = "/Autos/GetColores";
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(function (color) {
+                    var option = document.createElement("option");
+                    option.value = color.id;
+                    option.text = color.nColor;
+                    colorSelect.appendChild(option)
+                });
+            })
+    }
+</script>

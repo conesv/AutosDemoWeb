@@ -1,0 +1,210 @@
+﻿@using BLLAUTOS;
+@using BLLAUTOS.Services.Contracts;
+@model DALAUTOS.Model.Auto
+
+@{
+    ViewData["Title"] = "EditarAuto";
+    //ColorBLL _colorBLL = new ColorBLL();
+    //MarcasBLL _marcasBLL = new MarcasBLL();
+    //ModelosBLL _modelosBLL = new ModelosBLL();
+    //var marcas = await _marcasBLL.GetMarcasAsync();
+    //var colores = await _colorBLL.GetColorsAsync();
+    //var modelos = await _modelosBLL.GetModelosAsync();
+
+    //IServiceModelo _serviceModelo;
+    //var modelos = await _serviceModelo.GetModelosAsync();
+
+
+}
+
+<h1>Editar Auto</h1>
+
+<h4>Auto</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditarAuto">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="MarcaId" class="control-label">Marca</label>
+                <select id="marca-select" asp-for="MarcaId" class="form-control">
+                    @*@foreach (var marca in marcas)
+                    {*@
+                        <option value="@Model.Marca.Id">@Model.Marca.NMarca</option>
+                    @*}*@
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ColorId" class="control-label">Color</label>
+                <select asp-for="ColorId" class="form-control">
+                    @*@foreach (var color in colores)
+                    {*@
+                        <option value="@Model.Color.Id">@Model.Color.NColor</option>
+                    @*}*@
+                </select>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="status" /> @Html.DisplayNameFor(model => model.status)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="year" class="control-label">Año</label>
+                <input asp-for="year" class="form-control" />
+                <span asp-validation-for="year" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ModeloId" class="control-label">Modelo</label>
+                <select id="modelo-select" asp-for="ModeloId" class="form-control">
+                    @*@foreach (var modelo in modelos)
+                    {*@
+                            <option value="@Model.Modelo.Id">@Model.Modelo.Name</option>
+                   @* }*@
+                </select>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <img src="@Model.Modelo.Foto" width="800" height="600" id="Image-Auto" class="img-auto"/>
+    </div>
+</div>
+
+<style>
+    .img-auto:hover{
+        transform: scale(1.2);
+        transition: transform 0.3s ease; 
+    }
+</style>
+
+<div>
+    <a asp-action="VerAutos" asp-route-page="1">Volver</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
+
+<script>
+    var marcaSelect = document.getElementById("marca-select");
+    var modeloSelect = document.getElementById("modelo-select");
+    var imagenauto = document.getElementById("Image-Auto");
+
+    marcaSelect.addEventListener("change", function(){
+        updateImageN();
+    });
+
+    modeloSelect.addEventListener("change", function () {
+        var modeloId = modeloSelect.value;
+        var url = "/Autos/GetModeloById?modeloId=" + modeloId;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                imagenauto.src = data;
+            })
+            .catch(error => console.log(error));
+    });
+
+    window.onload = function () {
+        getModels();
+        updateImage();
+    };
+        
+        function updateImage(){
+            var marcaId = marcaSelect.value;
+            var url = "/Autos/GetModelosByMarca?marcaId=" + marcaId;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    modeloSelect.innerHTML = "";
+
+                    data.forEach(function (modelo) {
+                        var option = document.createElement("option");
+                        option.value = modelo.id;
+                        option.text = modelo.name;
+                        modeloSelect.appendChild(option);
+
+                    var selectedModeloId = @Model.ModeloId;
+
+                    for (var i = 0; i < modeloSelect.options.length; i++) {
+                        if (modeloSelect.options[i].value == selectedModeloId) {
+                            modeloSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                        var modeloId = modeloSelect.value;
+                        var url = "/Autos/GetModeloById?modeloId=" + @Model.Modelo.Id;
+
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                imagenauto.src = data;
+                            })
+                            .catch(error => console.log(error))
+                    });
+                })
+                .catch(error => console.log(error));
+        }
+
+        function getModels(){
+        var url = "/Autos/GetMarcas";
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(function(marca){
+                    var option = document.createElement("option");
+                    option.value = marca.id;
+                    option.text = marca.nMarca;
+                    marcaSelect.appendChild(option);
+                });
+            })
+        }
+
+
+    function updateImageN() {
+        var marcaId = marcaSelect.value;
+        var url = "/Autos/GetModelosByMarca?marcaId=" + marcaId;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                modeloSelect.innerHTML = "";
+
+                data.forEach(function (modelo) {
+                    var option = document.createElement("option");
+                    option.value = modelo.id;
+                    option.text = modelo.name;
+                    modeloSelect.appendChild(option);
+
+                    var selectedModeloId = @Model.ModeloId;
+
+                    for (var i = 0; i < modeloSelect.options.length; i++) {
+                        if (modeloSelect.options[i].value == selectedModeloId) {
+                            modeloSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    var modeloId = modeloSelect.value;
+                    var url = "/Autos/GetModeloById?modeloId=" + modeloId;
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            imagenauto.src = data;
+                        })
+                        .catch(error => console.log(error))
+                });
+            })
+            .catch(error => console.log(error));
+    }
+</script>
+
